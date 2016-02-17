@@ -1,0 +1,178 @@
+1. Install Java
+      a. Download Java and extract in Downloads folder
+      b. In Terminal
+           > gedit ~/.bashrc
+           > Paste the following lines (by replacing the java path alone)
+              #--insert JAVA_HOME
+		          JAVA_HOME= /opt/jdk1.8.0_05
+            	#--in PATH variable just append at the end of the line
+		          PATH=$PATH:$JAVA_HOME/bin
+	            #--Append JAVA_HOME at end of the export statement
+		          export PATH JAVA_HOME
+		  c. save by giving command as
+	       > source ~/.bashrc
+	         
+	       >java -version
+	   
+2. Install ssh for passwordless authentication
+	    a. > sudo apt-get update
+	    b. > sudo  apt-get install openssh-server
+    	c. > ssh localhost
+	    d. > ssh-keygen
+	    e. > ssh-copy-id -i localhost     (Don't mention any path during key generation)
+	    
+3.  Install Hadoop
+    	a. Extract hadoop at java location itself
+	    b. >gedit ~/.bashrc
+             paste the following lines below java path (change the path)
+	
+	              #--insert HADOOP_PREFIX
+		            HADOOP_PREFIX=/opt/hadoop-2.7.0
+	            #--in PATH variable just append at the end of the line
+		            PATH=$PATH:$HADOOP_PREFIX/bin
+	          #--Append HADOOP_PREFIX at end of the export statement
+		            export PATH JAVA_HOME HADOOP_PREFIX
+	    c. save it
+		      >source ~/.bashrc
+
+		      > echo $HADOOP_PREFIX  (to check the path)
+		      > cd $HADOOP_PREFIX
+		      > bin/hadoop version
+		      
+4. Modifying the Hadoop configuration files
+	(i) cd $HADOOP_PREFIX/etc/hadoop
+		> gedit hadoop-env.sh
+			(paste the java n hadoop path as the first two lines)
+				export JAVA_HOME=/usr/local/jdk1.8.0_05
+				export HADOOP_PREFIX=/opt/hadoop-2.7.0
+				
+	(ii) Modify the core-site.xml
+		> gedit core-site.xml
+                              Paste the line within <configuration>    </configuration>
+		<configuration>
+			<property>
+			<name>fs.defaultFS</name>
+			<value>hdfs://localhost:9000</value>
+			</property>
+		</configuration>
+	
+	(iii) Modify the hdfs-site.xml
+		> gedit hdfs-site.xml
+			Paste
+		<configuration>
+			<property>
+			<name>dfs.replication</name>
+			<value>1</value>
+			</property>
+		</configuration>
+
+	(iv) modify the mapred-site.xml
+		>  cp mapred-site.xml.template mapred-site.xml
+		> gedit mapred-site.xml
+			<configuration>
+				<property>
+				<name>mapreduce.framework.name</name>
+				<value>yarn</value>
+				</property>
+			</configuration>
+	
+	(v) Modiy yarn-site.xml
+		> gedit yarn-site.xml
+			<configuration>
+				<property>
+				<name>yarn.nodemanager.aux-services</name>
+				<value>mapreduce_shuffle</value>
+				</property>
+			</configuration>
+			
+6. Formatting the HDFS file-system via the NameNode
+    	> cd $HADOOP_PREFIX
+    	> bin/hadoop namenode -format
+
+       after formatting is over start the services
+
+7. Starting the services
+      	> sbin/start-dfs.sh
+	       > sbin/start-yarn.sh
+              else
+	         > sbin/start-all.sh
+	         
+	to check running services
+		>jps
+			3200 DataNode
+			12563 Jps
+			4036 ResourceManager
+			4172 NodeManager
+			5158 NameNode
+			3685 SecondaryNameNode
+			
+			
+8. Stopping Services
+             	> sbin/stop-dfs.sh
+		          > sbin/stop-yarn.sh
+
+			            (or)
+	          	>sbin/stop-all.sh
+	Once you start services after stopping means 
+		> jps
+			12563 Jps
+			4036 ResourceManager
+			4172 NodeManager
+			3685 SecondaryNameNode 
+			
+9. only four services will run. To start datanode and name node we have to add some lines in hdfs- site.xml
+
+	> cd $HADOOP_PREFIX/etc/hadoop
+	> gedit hdfs-site.xml
+
+			<property>
+			<name>dfs.namenode.name.dir</name>
+			<value>/opt/name</value>
+			</property>
+			
+			<property>
+			<name>dfs.datanode.name.dir</name>
+			<value>/opt/data</value>
+			</property>
+	> sudo mkdir /opt/name
+	> sudo mkdir /opt/data
+	> ls /opt/
+	> ls -l /opt/     To change the directory from root user to admin user
+	> sudo chown vrscet:vrscet -R /opt
+	> ls -l /opt/
+	
+10. Format the namenode
+		> cd $HADOOP_PREFIX
+		> bin/hadoop namenode -format
+
+11. Start services
+		>sbin/start-dfs.sh
+		>sbin/start-yarn.sh
+		>jps
+			3200 DataNode
+			12563 Jps
+			4036 ResourceManager
+			4172 NodeManager
+			5158 NameNode
+			3685 SecondaryNameNode
+
+12. To view in Browser
+                 localhost:50070
+	     localhost:8088
+
+13. To create and move files in HDFS
+		> bin/hadoop fs -mkdir /bala2
+	
+Move file from Local to HDFS
+	> bin/hadoop fs -copyFromLocal /home/vrscet/Downloads/mrsampledata /bala2
+	
+Running Mapreduce Program
+	> .bin/hadoop jar share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.0.jar wordcount /bala2/mrsampledata /output2
+				
+
+View in Browser: 
+Localhost:50070    ->  Utilities  -> Browse the filesystem -> 
+							bala2 ->mrsampledata -> file1....8
+							output2-> part-0000 -> Download -> view.
+
+
