@@ -1,0 +1,137 @@
+Caffe installation:
+I. Create folder
+    cd ~ mkdir deep-learning
+    cd deep-learning
+
+II. Installing the dependencies
+1. sudo apt-get install libprotobuf-dev libleveldb-dev libsnappy-dev libopencv-dev libhdf5-serial-dev protobuf-compiler
+2. sudo apt-get install --no-install-recommends libboost-all-dev
+3. sudo apt-get install libatlas-base-dev
+4. sudo apt-get install the python-dev
+5. sudo apt-get install libgflags-dev libgoogle-glog-dev liblmdb-dev
+
+III.  Compile and Install Caffe
+1. cd ~/deep-learning
+2. git clone http://github.com/BVLC/caffe.git
+ # error will come, solve it by 
+ sudo apt-get install git
+3. cd caffe
+4. cp Makefile.config.example Makefile.config
+5. gedit Makefile.config
+      and uncommand the # CPU_ONLY := 1 and make it as CPU_ONLY :=1
+
+IV Make Caffe Procedure
+
+1. make all   # error will arise solve it by
+
+sudo apt-get install libprotobuf-dev libleveldb-dev libsnappy-dev libopencv-dev libboost-all-dev libhdf5-serial-dev libgflags-dev libgoogle-glog-dev liblmdb-dev protobuf-compiler libatlas-base-dev
+sudo apt-get install python-dev python-pip gfortran
+
+2. make test
+3. make runtest
+
+
+V  python python/classify.py /examples/images/cat.jpg foo
+clearing errors
+1. sudo apt-get install python-numpy
+
+2.ImportError: No module named _caffe
+
+solution:
+1. make pycaffe
+2. install skimage
+		pip install -U scikit-image  (error)
+		1. sudo apt-get install python-pip
+now give command -  pip install -U scikit-image (error) 
+[ImportError: No module named scipy]
+
+			2. sudo apt-get install python-scipy
+			3. pip install -U scikit-image
+After installation it automatically downloads matplotlib of ~54mb
+
+
+echo export PYTHONPATH=~/deeplearning/caffe/python:$PYTHONPATH >> ~/.bashrc 
+
+
+
+
+V Adding Dependencies:
+1.wget http://dl.caffe.berkeleyvision.org/bvlc_googlenet.caffemodel 
+mv bvlc_googlenet.caffemodel caffe/models/bvlc_googlenet/ 
+git clone https://github.com/google/deepdream.git
+
+
+
+sudo pip install "ipython[all]" 
+sudo pip install numpy 
+sudo pip install scipy 
+sudo pip install protobuf 
+sudo pip install skimage / pip install -U scikit-image –user
+
+
+
+// RuntimeError: Could not open file python/../models/bvlc_reference_caffenet/bvlc_reference_caffenet.caffemodel
+
+
+Solution:
+	Download : https://github.com/BVLC/caffe/tree/master/models/bvlc_reference_caffenet
+
+dl.caffe.berkeleyvision.org/bvlc_reference_caffenet.caffemodel
+
+
+After downloading Paste the file ~243.7mb at 
+	/home/vrscet/Downloads/deeplearning/caffe/models/bvlc_googlenet
+ 
+
+
+> python python/classify.py /examples/images/cat.jpg foo
+
+You will face error regarding :
+Traceback (most recent call last):
+
+  File "python/classify.py", line 138, in <module>
+
+    main(sys.argv)
+
+  File "python/classify.py", line 110, in main
+
+    channel_swap=channel_swap)
+
+  File "/home/vrscet/Downloads/deeplearning/caffe/python/caffe/classifier.py", line 34, in __init__
+
+    self.transformer.set_mean(in_, mean)
+
+  File "/home/vrscet/Downloads/deeplearning/caffe/python/caffe/io.py", line 258, in set_mean
+
+    raise ValueError('Mean shape incompatible with input shape.')
+
+ValueError: Mean shape incompatible with input shape
+
+replace: Line 257 : 
+if ms != self.inputs[in_][1:]:
+    raise ValueError('Mean shape incompatible with input shape.')
+as 
+if ms != self.inputs[in_][1:]:
+    print(self.inputs[in_])
+    in_shape = self.inputs[in_][1:]
+    m_min, m_max = mean.min(), mean.max()
+    normal_mean = (mean - m_min) / (m_max - m_min)
+    mean = resize_image(normal_mean.transpose((1,2,0)),in_shape[1:]).transpose((2,0,1)) * (m_max - m_min) + m_min
+
+> python python/classify.py /home/vrscet/Downloads/deeplearning/caffe/examples/images/cat.jpg foo
+
+> python
+
+>>>import numpy
+>>>numpy.load("foo.npy")                               OUTPUT
+
+
+
+
+
+
+
+
+
+
+
